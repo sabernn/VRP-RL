@@ -3,6 +3,7 @@ import numpy as np
 import time
 from shared.embeddings import LinearEmbedding
 from shared.decode_step import RNNDecodeStep
+import matplotlib.pyplot as plt
 
 class RLAgent(object):
     
@@ -392,7 +393,20 @@ class RLAgent(object):
     def run_train_step(self):
         data = self.dataGen.get_train_next()
 
+        plt.plot(data[0,-1,0],data[0,-1,1],'d')
+        plt.plot(data[0,0:-1,0],data[0,0:-1,1],'o')
+        
+        for i in range(len(data[0,:,0])):
+            plt.text(data[0,i,0],data[0,i,1],"  {0} ,{1}".format(i,data[0,i,2]))
+
+
         train_results = self.sess.run(self.train_step,
                                  feed_dict={self.env.input_data:data,
                                   self.decodeStep.dropout:self.args['dropout']})
+        idx=[]
+        for i in range(16):
+            idx.append(train_results[11][i][0][0])
+
+        plt.plot(data[0,idx,0],data[0,idx,1])
+        plt.show()
         return train_results
